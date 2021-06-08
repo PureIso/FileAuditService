@@ -4,7 +4,8 @@ Monitoring software that will log file access to specified directories.
 
 ## Core Features
 
-Service will monitor specified directory and output the following on detection to a specifide output directory
+Service will monitor access to specified directory.
+The service will log the following information below if those information can be traced.
 
 - Output
   - Timestamp
@@ -24,8 +25,29 @@ Service will monitor specified directory and output the following on detection t
 ## Known Issues
 
 - Services information logging is too slow taking roughly about 5 seconds in which the system that is modifying the file could have been closed. Although it is still possible to detect file change, the problem is that process is set to explorer.exe's pid.
-- Service currently only accepts single directory
-- Minior inconvinience but Handle.exe has to be downloaded seperatly
+- Minior inconvinience but Handle.exe has to be downloaded seperatly (The version is also important especially when dealing with x64)
+- Some application loads into memory and closes handle so you might niss the handle. Possible solution is to monitor Win32_ProcessStartTrace
+
+Example of Win32_ProcessStartTrace monitoring WINWORD.EXE (Placeholder for research)
+
+```C#
+            try
+            {
+                ManagementEventWatcher startWatch = new ManagementEventWatcher(
+                    new WqlEventQuery("SELECT * FROM Win32_ProcessStartTrace WHERE ProcessName = WINWORD.EXE"));
+                startWatch.EventArrived += new EventArrivedEventHandler(startWatch_EventArrived);
+                startWatch.Start();
+
+                ManagementEventWatcher stopWatch = new ManagementEventWatcher(
+                    new WqlEventQuery("SELECT * FROM Win32_ProcessStopTrace WHERE ProcessName = WINWORD.EXE"));
+                stopWatch.EventArrived += new EventArrivedEventHandler(stopWatch_EventArrived);
+                stopWatch.Start();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.StackTrace);
+            }
+```
 
 ## Technologies
 
@@ -48,11 +70,12 @@ Example Below
 ```json
 {
   "AuditorSettings": {
-    "AuditDirectoryInput": "C:\\Users\\user\\Desktop\\audit_directory_input",
-    "AuditDirectoryOutput": "C:\\Users\\user\\Desktop\\audit_directory_output",
+    "AuditInputDirectories": [ "C:\\Users\\user\\Desktop\\audit_directory_input", "C:\\Users\\user\\Desktop\\audit_directory_input2" ],
+    "AuditOutputDirectory": "C:\\Users\\user\\Desktop\\audit_directory_output",
     "Filter": "*.txt",
     "InternalBufferSize": 65536,
-    "HandleExecutablePath": "C:\\Users\\user\\Desktop\\handle.exe"
+    "HandleExecutablePath": "C:\\Users\\user\\Desktop\\handle64.exe",
+    "IncludeSubdirectories": true
   },
   "Serilog": {
     "Using": [ "Serilog.Sinks.Console" ],

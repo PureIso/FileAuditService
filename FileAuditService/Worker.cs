@@ -9,8 +9,10 @@ namespace FileAuditService
 {
     public class Worker : BackgroundService
     {
+        #region Fields
         private readonly ILogger<Worker> _logger;
         private readonly IAuditor _auditor;
+        #endregion
 
         public Worker(ILogger<Worker> logger, IAuditor auditor)
         {

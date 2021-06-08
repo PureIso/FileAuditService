@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using FileAuditService.Core.Models;
 
@@ -13,8 +14,10 @@ namespace FileAuditService.Core.Interfaces
         bool Stop();
         void AuditQueueHandler();
         void FileSystemWatcherQueue(object sender, FileSystemEventArgs e);
-        AuditOutput Win32ProcessQuery(string filename);
-        AuditOutput HandleExecutableProcess(AuditQueue auditQueue);
+        void FileSystemWatcherOnError(object sender, ErrorEventArgs e);
+        void FileSystemWatcherOnOnRenamed(object sender, RenamedEventArgs e);
+        List<AuditOutput> Win32ProcessQuery(AuditQueue auditQueue);
+        List<AuditOutput> HandleExecutableProcess(AuditQueue auditQueue);
         void DetailedExceptionHandler(Exception ex);
     }
 }
