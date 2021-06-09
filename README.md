@@ -49,6 +49,17 @@ Example of Win32_ProcessStartTrace monitoring WINWORD.EXE (Placeholder for resea
             }
 ```
 
+Alternative Solution but with no content results:
+Using Restart Manager Session to monitor registered resources.
+
+```C#
+[DllImport("rstrtmgr.dll", CharSet = CharSet.Auto, SetLastError = true)]
+static extern int RmStartSession(out uint pSessionHandle, int dwSessionFlags, string strSessionKey);
+
+[DllImport("rstrtmgr.dll", CharSet = CharSet.Auto, SetLastError = true)]
+static extern int RmRegisterResources(uint pSessionHandle, UInt32 nFiles, string[] rgsFilenames, UInt32 nApplications, [In] RM_UNIQUE_PROCESS[] rgApplications, UInt32 nServices, string[] rgsServiceNames);
+```
+
 ## Technologies
 
 - [.Net 5 C#](https://devblogs.microsoft.com/dotnet/announcing-net-5-0-preview-1/) - (Language - Backend)
